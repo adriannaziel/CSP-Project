@@ -3,14 +3,13 @@ import java.util.ArrayList;
 public class LatinSquare {
 
     int N;
-    SquareVariable[][] board ;
 
     public LatinSquare(int problem_size){
         N = problem_size;
     }
 
-    public void backtrack(){ // bool? lista? params?
-        fillBoard();
+    public SquareVariable[][] backtrack(SquareVariable[][] board){ 
+
 
 
         int set = 1;
@@ -19,7 +18,6 @@ public class LatinSquare {
 
         int row=0;
         int col = 0;
-        //int lastsetval = -1;
 
         while (set <= toset){
             System.out.println("........................................");
@@ -28,10 +26,10 @@ public class LatinSquare {
 
             if(row == -1 || col == -1){ // &&
                 System.out.println("Nie ma rozwiazania");
-                return;
+                return null;
             }
 
-            int applied = applyBTWihoutAll(board[row][col], row, col, board[row][col].tried); /// moze row i col w sv?
+            int applied = applyBTWihoutAll(board, row, col); /// moze row i col w sv? ??
 
             System.out.println("aplied:" + applied);
 
@@ -39,15 +37,13 @@ public class LatinSquare {
                 System.out.println("ok");
                 System.out.println( "cv:" + board[row][col].curr_val + " ts: " +board[row][col].tried.size() );
                 set +=1;
-                //board[row][col].tried.add()
-                //lastsetval = board[row][col].curr_val;
                  Tuple<Integer> nextfield = getNextField(row,col);
                  row = nextfield.a;
                  col = nextfield.b;
 
 
                 //System.out.println(row + " " + col);
-                printMatrix();
+                printMatrix(board);
             }//if
 
             else{
@@ -70,6 +66,7 @@ public class LatinSquare {
         }//while
 
         System.out.println("liczba nawrotow: " + back);
+        return board;
 
     }
 
@@ -97,11 +94,12 @@ public class LatinSquare {
 
 
 
-    public int applyBTWihoutAll(SquareVariable sv, int i, int j, ArrayList<Integer> wihout){
+    public int applyBTWihoutAll(SquareVariable[][] board, int i, int j){
         int applied = -1;  // bool?
-        for(int value :sv.domain.get(sv.domain.size()-1)){
-            if(applied == -1 && !wihout.contains(value)){
-                if(canInsertValue(value,i,j)){
+        SquareVariable sv = board[i][j];
+        for(int value :sv.domains.get(sv.domains.size()-1)){
+            if(applied == -1 && !sv.tried.contains(value)){
+                if(canInsertValue(board, value,i,j)){
                     sv.curr_val = value;
                     sv.tried.add(value);
                     applied = value;
@@ -115,12 +113,11 @@ public class LatinSquare {
 
 
 
-    public boolean canInsertValue(int value, int i , int j){
+    public boolean canInsertValue(SquareVariable[][] board, int value, int i , int j){
         boolean canInsert = true;
 
         for(int k =0; k<N; k++){
             if(board[i][k].curr_val == value){
-               // return false; to mozna poprawic w profilerze
                 canInsert = false;
             }
         }
@@ -128,7 +125,6 @@ public class LatinSquare {
         //in j column
         for(int k =0; k<N; k++){
             if(board[k][j].curr_val == value){
-                //return false;
                 canInsert = false;
             }
         }
@@ -165,18 +161,16 @@ public class LatinSquare {
 
 
 
-    public void fwdcheck(){ // bool? lista? params?
+    public SquareVariable[][] fwdcheck(SquareVariable[][] board){
 
-        fillBoard();
 
         int set = 1;
-        int toset = N*N;//mozna pogorszyc mnozac w kodzie v
+        int toset = N*N;
 
         int back=0;
 
         int row=0;
         int col = 0;
-        //int lastsetval = -1;
 
         while (set <= toset){
             System.out.println("........................................");
@@ -185,40 +179,39 @@ public class LatinSquare {
 
             if(row == -1 || col == -1){ // &&
                 System.out.println("Nie ma rozwiazania");
-                return;
+                return null;
             }
 
-            Integer a = board[row][col].domain.size();
-            System.out.println( "cv:" + board[row][col].curr_val + " ds: " + a  + "wd: "  +board[row][col].domain.get(a-1).size() );
+            Integer a = board[row][col].domains.size();
+            System.out.println( "cv:" + board[row][col].curr_val + " ds: " + a  + "wd: "  +board[row][col].domains.get(a-1).size() );
 
 
-            int applied = applyFC(board[row][col], row, col); /// moze row i col w sv?
+            int applied = applyFC(board, row, col); /// moze row i col w sv?
 
             System.out.println("aplied:" + applied);
 
             if(applied != -1){
                 System.out.println("ok");
                 set +=1;
+                updateValues(board,applied,row,col);
 
                 Tuple<Integer> nextfield = getNextField(row,col);
                 row = nextfield.a;
                 col = nextfield.b;
 
-                printMatrix();
+                printMatrix(board);
             }//if
 
             else{
                 System.out.println("nawrot");
                 back +=1;
                 set -=1 ;
-                board[row][col].domain.remove(board[row][col].domain.size()-1);
-                board[row][col].addNewDomain();
                 board[row][col].curr_val = 0;
 
                 Tuple<Integer> prevfield = getPrevField(row,col);
                 row = prevfield.a;
                 col = prevfield.b;
-
+                removeAffectedDomains(board,row,col);
 
 
             }//else
@@ -227,6 +220,7 @@ public class LatinSquare {
         }//while
 
         System.out.println("liczba nawrotow: " + back);
+        return board;
 
     }
 
@@ -234,28 +228,73 @@ public class LatinSquare {
 
 
 
-
-    public void updateValues(int value, int i , int j){
-
-        for(int k =0; k<N; k++){
-            ArrayList<ArrayList<Integer>> domains = board[i][k].domain;
-            domains.get(domains.size()-1).remove((Integer)value);
+    private void removeAffectedDomains(SquareVariable[][] board, int row, int col) {
+        for (int m = 0 ; m<N; m++) {
+            for (int n = 0; n < N; n++) {
+                if ((m == row || n == col) && !(m== row && n==col)) {
+                    //   ArrayList<Integer> newdomain = new ArrayList<>(board[m][n].getLastDomain());
+                    // newdomain.remove((Integer)value);
+                    board[m][n].domains.remove(board[m][n].domains.size() - 1);
+                    System.out.println("usunieto dziedzine " + m + " " + n  + " liczba: " + board[m][n].domains.size() + " dziedzina ost: " + board[m][n].getLastDomain().toString());
+                }
+            }
         }
 
-        //in j column
-        for(int k =0; k<N; k++){
-            ArrayList<ArrayList<Integer>> domains = board[k][j].domain;
-            domains.get(domains.size()-1).remove((Integer)value);
-        }
     }
 
 
-    public int applyFC(SquareVariable sv, int i, int j){
+
+
+    public void updateValues(SquareVariable[][]board, int value, int row , int col){
+
+        for (int m = 0 ; m<N; m++){
+            for(int n=0; n<N; n++){
+                if(m==row || n == col){
+                    ArrayList<Integer> newdomain = new ArrayList<>(board[m][n].getLastDomain());
+                    newdomain.remove((Integer)value);
+                    board[m][n].addNewDomain(newdomain);
+                    System.out.println("w dziedzinie " + m + " " + n + " usunieto " + value + " liczba: " + board[m][n].domains.size() + " dziedzina: " + board[m][n].getLastDomain().toString());
+                }
+            }
+        }
+
+
+
+//        for(int 11k =0; k<N; k++){
+//           ArrayList<Integer> newdomain = board[i][k].getLastDomain();
+//           newdomain.remove((Integer)value);
+//           board[i][k].addNewDomain(newdomain);
+//          //  board[i][k].getLastDomain().remove((Integer)value);
+//        }
+//
+//        //in j column
+//        for(int k =0; k<N; k++){
+//          //  ArrayList<ArrayList<Integer>> domains = board[k][j].domains;
+//            board[k][j].getLastDomain().remove((Integer)value);
+//        }
+    }
+
+
+//
+//    public void restoreAfterReturn(SquareVariable[][]board, int row , int col) {
+//
+//        for (int m = 0; m < N; m++) {
+//            for (int n = 0; n < N; n++) {
+//                if (m == row || n == col) {
+//                    board[m][n].domains.remove(board[m][n].domains.size() - 1);
+//                }
+//            }
+//        }
+//    }
+
+
+    public int applyFC(SquareVariable[][] board, int i, int j){ // nie wystarczy podac tylko sv?
         int applied = -1;  // bool?
-        if(!sv.domain.get(sv.domain.size()-1).isEmpty()){
-            applied = sv.domain.get(sv.domain.size()-1).get(0);
+        SquareVariable sv= board[i][j];
+        if(!sv.getLastDomain().isEmpty()){
+            System.out.println("last domain get 0 " + sv.getLastDomain().get(0));
+            applied = sv.getLastDomain().get(0);
             sv.curr_val = applied;
-            updateValues(applied,i,j);
         }
         return applied;
     }
@@ -263,19 +302,17 @@ public class LatinSquare {
 
 
 
-
-
-
-    public void fillBoard() {
-        board = new SquareVariable[N][N];
+    public SquareVariable[][] getEmptyBoard() {
+        SquareVariable[][] board = new SquareVariable[N][N];
         for(int i =0; i<N;i++){
             for(int j=0;j<N;j++){
                 board[i][j]= new SquareVariable(N);
             }
         }
+        return board;
     }
 
-    public void printMatrix(){
+    public void printMatrix(SquareVariable[][] board){
         for (int i = 0; i<N; i++){
             for(int j =0 ; j< N;j++){
                 System.out.print("[" + board[i][j].curr_val + "]");
@@ -290,9 +327,9 @@ public class LatinSquare {
         LatinSquare ls = new LatinSquare(6);
         //ls.printMatrix();
 
-        ls.backtrack();
+       // ls.backtrack(ls.getEmptyBoard());
 
-        ls.fwdcheck();
+      ls.fwdcheck(ls.getEmptyBoard());
 
     }
 }
