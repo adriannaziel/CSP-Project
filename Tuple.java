@@ -7,4 +7,9 @@ public class Tuple<T> {
         b=bx;
     }
 
+
+    @Override
+    public String toString() {
+        return "("+a.toString()+","+b.toString()+")";
+    }
 }
