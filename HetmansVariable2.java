@@ -1,22 +1,19 @@
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Set;
 
 public class HetmansVariable2 {
 
     int N;
-    int bt_curr_val;
     Tuple<Integer> curr_tuple;
 
-    ArrayList<Tuple<Integer>> tried;
+    ArrayList<Integer> tried;
 
     public ArrayList<ArrayList<Tuple<Integer>>> domains;
     int id;
 
-    public HetmansVariable2(int id, int nx) {
-        this.id = id;
+    public HetmansVariable2(int idx, int nx) {
+        id = idx;
         N = nx;
-        bt_curr_val = -1;
         curr_tuple=new Tuple<>(-1,-1);
 
         domains = new ArrayList<>();
@@ -37,12 +34,12 @@ public class HetmansVariable2 {
         }
     }
 
-    public void addNewDomain(ArrayList<Tuple<Integer>> newd) {
-        domains.add(newd);
-//        domains.add(new ArrayList<Integer>());
-//        int[] range = IntStream.iterate(1, n -> {
-//            domains.get(domains.size()-1).add(n);return n + 1;}).limit(N).toArray();
-    }
+//    public void addNewDomain(ArrayList<Tuple<Integer>> newd) {
+//        domains.add(newd);
+////        domains.add(new ArrayList<Integer>());
+////        int[] range = IntStream.iterate(1, n -> {
+////            domains.get(domains.size()-1).add(n);return n + 1;}).limit(N).toArray();
+//    }
 
     public ArrayList<Tuple<Integer>> getLastDomain() {
         return domains.get(domains.size() - 1);
@@ -50,8 +47,9 @@ public class HetmansVariable2 {
 
     public HetmansVariable2 clone() {
         HetmansVariable2 hv = new HetmansVariable2(this.id, this.N);
-        hv.bt_curr_val = this.bt_curr_val;
+        hv.curr_tuple = this.curr_tuple;
         hv.domains = this.domains;
+        hv.tried = this.tried;
         return hv;
     }
 
@@ -104,5 +102,8 @@ public class HetmansVariable2 {
         }
         domain.remove(tupletoremove);
     }
+
+
+
 
 }

@@ -58,61 +58,183 @@ public class HetmansProblem2 {
         int set = 1;
         int toset = N;
         int back=0;
+        int loops = 0;
 
-       // int row=0;
-        //int col = 0;
-        int pos = 0;
-        int id = 0;
-        HetmansVariable2 hv = new HetmansVariable2(id,N);
+
+        HetmansVariable2 hv = new HetmansVariable2(set,N);
 
         while (set <= toset){
+            loops+=1;
 
-            if(pos>=N*N){
-                System.out.println("BRAK ROZWIAZANIA");
-                return null;
-            }
+//            if(pos>=N*N){
+//                System.out.println("BRAK ROZWIAZANIA");
+//                return null;
+//            }
 
-            System.out.println("........................................");
+           // System.out.println("........................................");
+            //System.out.println(set);
 
-            Tuple<Integer> t =hv.domains.get(0).get(pos);
-            System.out.println("probowane: " + t.a + " " +t.b+" pos: " + pos + " id to insert " + id );
-            if(canInsertValue(board,t.a, t.b)){
-                System.out.println("wstawiane: " + t.a + " " +t.b + "id: " + id);
-                set +=1;
-                hv.bt_curr_val = pos;
+           Tuple<Integer> applied = applyBTWihoutAll(hv,board);
+          //  System.out.println("applied " + applied);
+
+            if(!applied.equals(new Tuple<>(-1,-1))){
+                System.out.println("ok");
+               // System.out.println(hv.curr_tuple);
+                set+=1;
+                board[hv.curr_tuple.a][hv.curr_tuple.b] = true;
+
                 result.add(hv.clone());
-                System.out.println("rs: " +result.size());
-                board[t.a][t.b] = true;
-                hv = new HetmansVariable2(id+=1,N);
+                hv = new HetmansVariable2(set,N);
+               // System.out.println("new hv:" + hv.curr_tuple);
+               // System.out.println("result: " + result.size());
+               // for(HetmansVariable2 h : result){
+                //    System.out.print("id: " + h.id + " pos: " + h.curr_tuple + " ");
+               // }
+                //System.out.println();
+
                 printMatrix(board);
-                pos = 0;
-
-                for(HetmansVariable2 h : result){
-                    System.out.print("id: " + h.id + " pos: " + h.bt_curr_val + " ");
-                }
-                System.out.println();
-
             }
+
             else{
-                pos+=1;
-                if(pos>=N*N){
-                    System.out.println("NAWROT");
-                    back+=1; // ?
-                    hv = result.get(result.size()-1);
-                    board[hv.domains.get(0).get(hv.bt_curr_val).a][hv.domains.get(0).get(hv.bt_curr_val).b] = false;
-                    result.remove(result.size()-1);
-                    System.out.println("id: "+hv.id);
-                    pos=hv.bt_curr_val +=1;
-                    set -=1;
-                    id-=1;
-                    printMatrix(board);
+                System.out.println("nawrot");
+                back+=1;
+                set -=1;
+                hv.tried = new ArrayList<>();
+                hv.curr_tuple = new Tuple<>(-1,-1);
+
+                if (result.size()==0){
+                    System.out.println("brak!");
+                    return null;
                 }
+                hv = result.get(result.size()-1);
+               // System.out.println("er " + hv.curr_tuple);
+                board[hv.curr_tuple.a][hv.curr_tuple.b] = false;
+                result.remove(result.size()-1);
+
+                printMatrix(board);
+
             }
+
+
+
+
         }//while
 
-        System.out.println("liczba nawrotow: " + back);
+        System.out.println("liczba nawrotow: " + back + " petli " + loops);
         return result;
 
+    }
+
+
+//    public ArrayList<HetmansVariable2> backtrackAll(boolean[][] board){
+//
+//        int all = 0;
+//        boolean count = true;
+//
+//        ArrayList<HetmansVariable2> result = new ArrayList<>();
+//
+//        int set = 1;
+//        int toset = N;
+//        int back=0;
+//
+//
+//        HetmansVariable2 hv = new HetmansVariable2(set,N);
+//
+//        while (count) {
+//
+//            while (set <= toset) {
+//
+////            if(pos>=N*N){
+////                System.out.println("BRAK ROZWIAZANIA");
+////                return null;
+////            }
+//
+//                System.out.println("........................................");
+//                System.out.println(set);
+//
+//                Tuple<Integer> applied = applyBTWihoutAll(hv, board);
+//                System.out.println("applied " + applied);
+//
+//                if (!applied.equals(new Tuple<>(-1, -1))) {
+//                    System.out.println("ok");
+//                    System.out.println(hv.curr_tuple);
+//                    set += 1;
+//                    board[hv.curr_tuple.a][hv.curr_tuple.b] = true;
+//
+//                    result.add(hv.clone());
+//                    hv = new HetmansVariable2(set, N);
+//                    System.out.println("new hv:" + hv.curr_tuple);
+//                    System.out.println("result: " + result.size());
+//                    for (HetmansVariable2 h : result) {
+//                        System.out.print("id: " + h.id + " pos: " + h.curr_tuple + " ");
+//                    }
+//                    System.out.println();
+//
+//                    printMatrix(board);
+//                } else {
+//                    System.out.println("nawrot");
+//                    back += 1;
+//                    set -= 1;
+//                    hv.tried = new ArrayList<>();
+//                    hv.curr_tuple = new Tuple<>(-1, -1);
+//
+//                    if (result.size() == 0) {
+//                        System.out.println("brak!");
+//                        return null;
+//                    }
+//                    hv = result.get(result.size() - 1);
+//                    System.out.println("er " + hv.curr_tuple);
+//                    board[hv.curr_tuple.a][hv.curr_tuple.b] = false;
+//                    result.remove(result.size() - 1);
+//
+//                    printMatrix(board);
+//
+//                }
+//
+//
+//            }//while
+//
+//            System.out.println("liczba nawrotow: " + back);
+//            System.out.println("ALL: "+ all);
+//            back += 1;
+//            set -= 1;
+//            hv.tried = new ArrayList<>();
+//            hv.curr_tuple = new Tuple<>(-1, -1);
+//
+//            if (result.size() == 0) {
+//                System.out.println("brak!");
+//                return null;
+//            }
+//            hv = result.get(result.size() - 1);
+//            System.out.println("er " + hv.curr_tuple);
+//            board[hv.curr_tuple.a][hv.curr_tuple.b] = false;
+//            result.remove(result.size() - 1);
+//
+//            printMatrix(board);
+//        }
+//        return null;
+//    }
+
+
+
+
+    public Tuple<Integer> applyBTWihoutAll(HetmansVariable2 hv, boolean[][] board){
+        Tuple<Integer> applied = new Tuple<>(-1,-1);  // bool?
+       // SquareVariable sv = board[i][j];
+        //for(int value :sv.domains.get(sv.domains.size()-1)){
+        for(int nr = 0; nr<hv.getLastDomain().size();nr++){
+            Tuple<Integer> value = hv.getLastDomain().get(nr) ;
+            if( !hv.tried.contains(nr)){
+                if(canInsertValue(board,value.a,value.b)){
+                    hv.curr_tuple = value;
+                    hv.tried.add(nr);
+                    applied = value;
+                    return applied;
+                }
+            }
+        }
+
+        return applied;
     }
 
 
@@ -135,9 +257,11 @@ public class HetmansProblem2 {
         int id = 0;
 
         while (set < toset){
+
+
             loops_count+=1;
-            System.out.println("........................................");
-            System.out.println("id to set: " +id);
+          //  System.out.println("........................................");
+        //    System.out.println("id to set: " +id);
          //   System.out.println("rc: " + row + " " + col);
 
 //            if(row == -1 || col == -1){ // &&
@@ -151,10 +275,10 @@ public class HetmansProblem2 {
 
             Tuple<Integer> applied = applyFC(result.get(id)); /// result last 0 a, b
 
-            System.out.println("aplied:" + applied);
 
             if(applied.a != -1 || applied.b != -1){
                 System.out.println("ok");
+               // System.out.println("aplied:" + applied);
                 set +=1;
                 id +=1;
                 board[applied.a][applied.b] = true;
@@ -176,6 +300,12 @@ public class HetmansProblem2 {
 
                 set -=1 ;
                 id -=1;
+
+                if(id == -1){
+                    System.out.println("Brak rozwiazania");
+                    return null;
+                }
+
                 board[result.get(id).curr_tuple.a][result.get(id).curr_tuple.b]=false;
 
                // Tuple<Integer> prevfield = getPrevField(row,col);
@@ -202,7 +332,7 @@ public class HetmansProblem2 {
     public Tuple<Integer> applyFC(HetmansVariable2 hv){
         Tuple<Integer> applied = new Tuple<>(-1,-1);  // bool?
         if(!hv.getLastDomain().isEmpty()){
-            System.out.println("last domain get 0 " + hv.getLastDomain().get(0));
+          //  System.out.println("last domain  " + hv.getLastDomain());
             applied = hv.getLastDomain().get(0);
             hv.curr_tuple = applied;
         }
@@ -214,17 +344,17 @@ public class HetmansProblem2 {
 
 
 
-    private void fixDomainsAfterReturn(HetmansVariable2[][] board, int row, int col) {
-        for (int m = 0 ; m<N; m++) {
-            for (int n = 0; n < N; n++) {
-                if ((m == row || n == col) && !(m== row && n==col)) {
-                    board[m][n].domains.remove(board[m][n].domains.size() - 1);
-                    System.out.println("usunieto dziedzine " + m + " " + n  + " liczba: " + board[m][n].domains.size() + " dziedzina ost: " + board[m][n].getLastDomain().toString());
-                }
-            }
-        }
-
-    }
+//    private void fixDomainsAfterReturn(HetmansVariable2[][] board, int row, int col) {
+//        for (int m = 0 ; m<N; m++) {
+//            for (int n = 0; n < N; n++) {
+//                if ((m == row || n == col) && !(m== row && n==col)) {
+//                    board[m][n].domains.remove(board[m][n].domains.size() - 1);
+//                    System.out.println("usunieto dziedzine " + m + " " + n  + " liczba: " + board[m][n].domains.size() + " dziedzina ost: " + board[m][n].getLastDomain().toString());
+//                }
+//            }
+//        }
+//
+//    }
 
     public void printMatrix(boolean[][] board){
         for (int i = 0; i<N; i++){
@@ -264,12 +394,14 @@ public class HetmansProblem2 {
 
 
     public static void main(String[] args) {
-        HetmansProblem2 hetmansProblem2 = new HetmansProblem2(4);
+        HetmansProblem2 hetmansProblem2 = new HetmansProblem2(6);
       //  boolean[][] t = hetmansProblem2.getBoard();
        // t[0][0]=true;
        // hetmansProblem2.printMatrix(t);
        // System.out.println(hetmansProblem2.canInsertValue(t,0,1));
-        hetmansProblem2.forwardcheck(hetmansProblem2.getBoard());
+        hetmansProblem2.backtrack(hetmansProblem2.getBoard());
+       hetmansProblem2.forwardcheck(hetmansProblem2.getBoard());
+
 
     }
 }
