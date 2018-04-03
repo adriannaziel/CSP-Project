@@ -23,9 +23,9 @@ public class LatinSquare {
 
         while (set <= toset){
             loop_count+=1;
-            System.out.println("........................................");
-            System.out.println("set: " +set);
-            System.out.println("rc: " + row + " " + col);
+            //System.out.println("........................................");
+            //System.out.println("set: " +set);
+           // System.out.println("rc: " + row + " " + col);
 
             if(row == -1 || col == -1){ // &&
                 System.out.println("Nie ma rozwiazania");
@@ -34,11 +34,11 @@ public class LatinSquare {
 
             int applied = applyBTWihoutAll(board, row, col);
 
-            System.out.println("aplied:" + applied);
+         //   System.out.println("aplied:" + applied);
 
             if(applied != -1){
                 System.out.println("ok");
-                System.out.println( "cv:" + board[row][col].curr_val + " ts: " +board[row][col].tried.size() );
+               // System.out.println( "cv:" + board[row][col].curr_val + " ts: " +board[row][col].tried.size() );
                 set +=1;
                  Tuple<Integer> nextfield = getNextField(row,col);
                  row = nextfield.a;
@@ -54,7 +54,7 @@ public class LatinSquare {
                 set -=1 ;
                 board[row][col].tried = new ArrayList<>();
                 board[row][col].curr_val = 0;
-                System.out.println( "cv:" + board[row][col].curr_val + " ts: " +board[row][col].tried.size() );
+               // System.out.println( "cv:" + board[row][col].curr_val + " ts: " +board[row][col].tried.size() );
 
                 Tuple<Integer> prevfield = getPrevField(row,col);
                 row = prevfield.a;
@@ -72,84 +72,59 @@ public class LatinSquare {
 
 
 
-    public ArrayList<SquareVariable[][]> backtrackAll(SquareVariable[][] board) {
-        ArrayList<SquareVariable[][]> all = new ArrayList<>();
+    public void backtrackAll(SquareVariable[][] board) {
 
+        int all =0;
 
         int set = 1;
         int toset = N * N;
-        int return_count = 0;
-        int loop_count = 0;
-
 
         int row = 0;
         int col = 0;
 
         boolean allb = true;
 
-        while(allb){ /// ze wszystkie
+        while(allb) { /// ze wszystkie
 
-        while (set <= toset) {
-            loop_count += 1;
-            System.out.println("........................................");
-            System.out.println("set: " + set);
-            System.out.println("rc: " + row + " " + col);
+            while (set <= toset) {
+                if (row == -1 || col == -1) { // &&
+                    System.out.println("LS BT Wszystkich rozwiazan: " + all);
+                    return;
+                }
 
-            if (row == -1 || col == -1) { // &&
-                System.out.println("Nie ma rozwiazania");
-                return null;
-            }
-
-            int applied = applyBTWihoutAll(board, row, col);
-
-            System.out.println("aplied:" + applied);
-
-            if (applied != -1) {
-                System.out.println("ok");
-                System.out.println("cv:" + board[row][col].curr_val + " ts: " + board[row][col].tried.size());
-                set += 1;
-                Tuple<Integer> nextfield = getNextField(row, col);
-                row = nextfield.a;
-                col = nextfield.b;
-
-                printMatrix(board);
-
-            }//if
-
-            else {
-                System.out.println("nawrot");
-                return_count += 1;
-                set -= 1;
-                board[row][col].tried = new ArrayList<>();
-                board[row][col].curr_val = 0;
-                System.out.println("cv:" + board[row][col].curr_val + " ts: " + board[row][col].tried.size());
-
-                Tuple<Integer> prevfield = getPrevField(row, col);
-                row = prevfield.a;
-                col = prevfield.b;
+                int applied = applyBTWihoutAll(board, row, col);
 
 
-            }//else
-        }//while
+                if (applied != -1) {
 
-        System.out.println("BT: liczba nawrotow: " + return_count + " liczba wywolan petli: " + loop_count);
-            System.out.println("rozwiazan: " + all.size());
-        all.add(board);
+                    set += 1;
+                    Tuple<Integer> nextfield = getNextField(row, col);
+                    row = nextfield.a;
+                    col = nextfield.b;
 
-           // System.out.println(row + " " + col);
+
+                }//if
+
+                else {
+                    set -= 1;
+                    board[row][col].tried = new ArrayList<>();
+                    board[row][col].curr_val = 0;
+
+                    Tuple<Integer> prevfield = getPrevField(row, col);
+                    row = prevfield.a;
+                    col = prevfield.b;
+
+
+                }//else
+            }//while
+            all += 1;
             set -= 1;
-            board[N-1][N-1].tried = new ArrayList<>();
-            board[N-1][N-1].curr_val = 0;
-           // System.out.println("cv:" + board[row][col].curr_val + " ts: " + board[row][col].tried.size());
-
-            Tuple<Integer> prevfield = getPrevField(N-1, N-1);
+            board[N - 1][N - 1].tried = new ArrayList<>();
+            board[N - 1][N - 1].curr_val = 0;
+            Tuple<Integer> prevfield = getPrevField(N - 1, N - 1);
             row = prevfield.a;
             col = prevfield.b;
-
-
-
-    }
-        return all;
+        }
 
     }
 
@@ -202,7 +177,7 @@ public class LatinSquare {
         SquareVariable sv = board[i][j];
         ArrayList<Integer> curr_dom = new ArrayList<>(sv.getLastDomain());
         Collections.shuffle(curr_dom);
-        System.out.println("currdom: " + curr_dom.toString());
+       // System.out.println("currdom: " + curr_dom.toString());
         for(int nr = 0; nr<curr_dom.size();nr++){
             int value = curr_dom.get(nr) ;
             if(applied == -1 && !sv.tried.contains(value)){
@@ -266,79 +241,267 @@ public class LatinSquare {
 
 
 
+
+
     ////////////////////////////////////////////// FWD
 
 
 
+//    public void updateValues(SquareVariable[][]board, int value, int row , int col) {
+//
+//        for (int m = 0; m < N; m++) {
+//            for (int n = 0; n < N; n++) {
+//                if (m == row || n == col) {
+//                    ArrayList<Integer> newdomain = new ArrayList<>(board[m][n].getLastDomain());
+//                    newdomain.remove((Integer) value);
+//                    board[m][n].addNewDomain(newdomain);
+//                    System.out.println("w dziedzinie " + m + " " + n + " usunieto " + value + " liczba: " + board[m][n].domains.size() + " dziedzina: " + board[m][n].getLastDomain().toString());
+//                }
+//            }
+//        }
+//
+//    }
+//    private void removeAffectedDomains(SquareVariable[][] board, int row, int col) {
+//        for (int m = 0 ; m<N; m++) {
+//            for (int n = 0; n < N; n++) {
+//                if ((m == row || n == col) && !(m== row && n==col)) {
+//                    //   ArrayList<Integer> newdomain = new ArrayList<>(board[m][n].getLastDomain());
+//                    // newdomain.remove((Integer)value);
+//                    board[m][n].domains.remove(board[m][n].domains.size() - 1);
+//                    System.out.println("usunieto dziedzine " + m + " " + n  + " liczba: " + board[m][n].domains.size() + " dziedzina ost: " + board[m][n].getLastDomain().toString());
+//                }
+//            }
+//        }
+//
+//    }
 
-    public SquareVariable[][] fwdcheck(SquareVariable[][] board){
+//    public int applyFC3(SquareVariable[][] board, int i, int j){ // nie wystarczy podac tylko sv?
+//        int applied = -1;  // bool?
+//        SquareVariable sv= board[i][j];
+//        if(!sv.getLastDomain().isEmpty()){
+//            System.out.println("last domain get 0 " + sv.getLastDomain().get(0));
+//            applied = sv.getLastDomain().get(0);
+//            sv.curr_val = applied;
+//        }
+//        return applied;
+//    }
+//
+//    public SquareVariable[][] fwdcheck2(SquareVariable[][] board){
+//
+//
+//        int set = 1;
+//        int toset = N*N;
+//
+//        int return_count=0;
+//        int loops_count = 0;
+//
+//        int row=0;
+//        int col = 0;
+//
+//        while (set <= toset){
+//            loops_count+=1;
+//            System.out.println("........................................");
+//            System.out.println("set: " +set);
+//            System.out.println("rc: " + row + " " + col);
+//
+//            if(row == -1 || col == -1){ // &&
+//                System.out.println("Nie ma rozwiazania");
+//                return null;
+//            }
+//
+//            Integer a = board[row][col].domains.size();
+//            System.out.println( "cv:" + board[row][col].curr_val + " ds: " + a  + "wd: "  +board[row][col].domains.get(a-1).size() );
+//
+//
+//            // int applied = applyFC(board, row, col);
+//            int applied = applyFC(board, row, col);
+//
+//            System.out.println("aplied:" + applied);
+//
+//            if(applied != -1){
+//                System.out.println("ok");
+//                set +=1;
+//                updateValuesInDomains(board,applied,row,col);
+//
+//                Tuple<Integer> nextfield = getNextField(row,col);
+//                row = nextfield.a;
+//                col = nextfield.b;
+//
+//                printMatrix(board);
+//            }//if
+//
+//            else{
+//                System.out.println("nawrot");
+//                return_count +=1;
+//                set -=1 ;
+//                board[row][col].curr_val = 0;
+//
+//                Tuple<Integer> prevfield = getPrevField(row,col);
+//                row = prevfield.a;
+//                col = prevfield.b;
+//                fixDomainsAfterReturn(board,row,col);
+//
+//
+//            }//else
+//
+//
+//        }//while
+//
+//        System.out.println("FC: liczba nawrotow: " + return_count + " liczba wywolan petli: " + loops_count);
+//        return board;
+//
+//    }
+//
+//    public SquareVariable[][] fwdcheck(SquareVariable[][] board){
+//
+//
+//        int set = 1;
+//        int toset = N*N;
+//
+//        int back=0;
+//
+//        int row=0;
+//        int col = 0;
+//
+//        while (set <= toset){
+//            System.out.println("........................................");
+//            System.out.println("set: " +set);
+//            System.out.println("rc: " + row + " " + col);
+//
+//            if(row == -1 || col == -1){ // &&
+//                System.out.println("Nie ma rozwiazania");
+//                return null;
+//            }
+//
+//            Integer a = board[row][col].domains.size();
+//            System.out.println( "cv:" + board[row][col].curr_val + " ds: " + a  + "wd: "  +board[row][col].domains.get(a-1).size() );
+//
+//
+//            int applied = applyFC(board, row, col); /// moze row i col w sv?
+//
+//            System.out.println("aplied:" + applied);
+//
+//            if(applied != -1){
+//                System.out.println("ok");
+//                set +=1;
+//                updateValuesInDomains(board,applied,row,col);
+//
+//                Tuple<Integer> nextfield = getNextField(row,col);
+//                row = nextfield.a;
+//                col = nextfield.b;
+//
+//                printMatrix(board);
+//            }//if
+//
+//            else{
+//                System.out.println("nawrot");
+//                back +=1;
+//                set -=1 ;
+//                board[row][col].curr_val = 0;
+//
+//                Tuple<Integer> prevfield = getPrevField(row,col);
+//                row = prevfield.a;
+//                col = prevfield.b;
+//                fixDomainsAfterReturn(board,row,col);
+//
+//
+//            }//else
+//
+//
+//        }//while
+//
+//        System.out.println("liczba nawrotow: " + back);
+//        return board;
+//
+//    }
 
 
-        int set = 1;
-        int toset = N*N;
 
-        int return_count=0;
-        int loops_count = 0;
+//    public void fwdcheckAll(SquareVariable[][] board) {
+//        int all = 0;
+//
+//
+//        int set = 1;
+//        int toset = N * N;
+//
+//        int return_count = 0;
+//        int loops_count = 0;
+//
+//        int row = 0;
+//        int col = 0;
+//        boolean count = true;
+//
+//        while (count){
+//
+//        while (set <= toset) {
+//            loops_count += 1;
+//            System.out.println("........................................");
+//            System.out.println("set: " + set);
+//            System.out.println("rc: " + row + " " + col);
+//
+//            if (row == -1 || col == -1) { // &&
+//                System.out.println("Nie ma rozwiazania");
+//                return;
+//            }
+//
+//            Integer a = board[row][col].domains.size();
+//            System.out.println("cv:" + board[row][col].curr_val + " ds: " + a + "wd: " + board[row][col].domains.get(a - 1).size());
+//
+//
+//            int applied = applyFC(board, row, col);
+//            //int applied = applyFCH1(board, row, col);
+//
+//            System.out.println("aplied:" + applied);
+//
+//            if (applied != -1) {
+//                System.out.println("ok");
+//                set += 1;
+//                updateValuesInDomains(board, applied, row, col);
+//
+//                Tuple<Integer> nextfield = getNextField(row, col);
+//                row = nextfield.a;
+//                col = nextfield.b;
+//
+//                printMatrix(board);
+//            }//if
+//
+//            else {
+//                System.out.println("nawrot");
+//                return_count += 1;
+//                set -= 1;
+//                board[row][col].curr_val = 0;
+//
+//                Tuple<Integer> prevfield = getPrevField(row, col);
+//                row = prevfield.a;
+//                col = prevfield.b;
+//                fixDomainsAfterReturn(board, row, col);
+//
+//
+//            }//else
+//
+//
+//        }//while
+//
+//        System.out.println("FC: liczba nawrotow: " + return_count + " liczba wywolan petli: " + loops_count);
+//        all+=1;
+//
+//            System.out.println("ROZWIAZAN: " + all);
+//            set -= 2;
+//            board[N-1][N-1].curr_val = 0;
+//            fixDomainsAfterReturn(board, N-1, N-1);
+//            Tuple<Integer> prevfield = getPrevField(N-1, N-1);
+//            row = prevfield.a;
+//            col = prevfield.b;
+//            fixDomainsAfterReturn(board, row, col);
+//
+//
+//
+//        }
+//
+//    }
 
-        int row=0;
-        int col = 0;
 
-        while (set <= toset){
-            loops_count+=1;
-            System.out.println("........................................");
-            System.out.println("set: " +set);
-            System.out.println("rc: " + row + " " + col);
-
-            if(row == -1 || col == -1){ // &&
-                System.out.println("Nie ma rozwiazania");
-                return null;
-            }
-
-            Integer a = board[row][col].domains.size();
-            System.out.println( "cv:" + board[row][col].curr_val + " ds: " + a  + "wd: "  +board[row][col].domains.get(a-1).size() );
-
-
-           // int applied = applyFC(board, row, col);
-           int applied = applyFCH1(board, row, col);
-
-            System.out.println("aplied:" + applied);
-
-            if(applied != -1){
-                System.out.println("ok");
-                set +=1;
-                updateValuesInDomains(board,applied,row,col);
-
-                Tuple<Integer> nextfield = getNextField(row,col);
-                row = nextfield.a;
-                col = nextfield.b;
-
-                printMatrix(board);
-            }//if
-
-            else{
-                System.out.println("nawrot");
-                return_count +=1;
-                set -=1 ;
-                board[row][col].curr_val = 0;
-
-                Tuple<Integer> prevfield = getPrevField(row,col);
-                row = prevfield.a;
-                col = prevfield.b;
-                fixDomainsAfterReturn(board,row,col);
-
-
-            }//else
-
-
-        }//while
-
-        System.out.println("FC: liczba nawrotow: " + return_count + " liczba wywolan petli: " + loops_count);
-        return board;
-
-    }
-
-
-    public SquareVariable[][] fwdcheckWithH1(SquareVariable[][] board){ // najmniej w dziedzinie
+    public SquareVariable[][] forwardCheckWithH1(SquareVariable[][] board){ // najmniej w dziedzinie
 
         ArrayList<Tuple<Integer>> visited  = new ArrayList<>();
 
@@ -411,16 +574,190 @@ public class LatinSquare {
 
     }
 
+
+    public SquareVariable[][] forwardCheck(SquareVariable[][] board){ // najmniej w dziedzinie
+
+        ArrayList<Tuple<Integer>> visited  = new ArrayList<>();
+
+        int set = 1;
+        int toset = N*N;
+
+        int return_count=0;
+        int loops_count = 0;
+
+        Tuple<Integer> coords =getNextFieldH1(board, visited);
+
+        int row = coords.a;
+        int col = coords.b;
+
+        while (set <= toset){
+            loops_count+=1;
+         //   System.out.println("........................................");
+        //    System.out.println("set: " +set);
+        //    System.out.println("rc: " + row + " " + col);
+
+            if(row == -1 || col == -1){ // &&
+                System.out.println("Nie ma rozwiazania");
+                return null;
+            }
+
+            Integer a = board[row][col].domains.size();
+         //   System.out.println( "cv:" + board[row][col].curr_val + " ds: " + a  + "wd: "  +board[row][col].domains.get(a-1).size() );
+
+
+            int applied = applyFC(board, row, col); /// moze row i col w sv?
+
+            //System.out.println("aplied:" + applied);
+
+            if(applied != -1){
+                System.out.println("ok");
+                set +=1;
+                updateValuesInDomains(board,applied,row,col);
+
+                visited.add(new Tuple<>(row,col));
+
+             //   for(Tuple<Integer> t :visited){
+              //      System.out.print(t.a + " " + t.b + " | ");
+             //   }
+                System.out.println();
+
+                Tuple<Integer> nextfield = getNextFieldH1(board, visited);
+                row = nextfield.a;
+                col = nextfield.b;
+
+
+
+                printMatrix(board);
+            }//if
+
+            else{
+                System.out.println("nawrot");
+                return_count +=1;
+                set -=1 ;
+                board[row][col].curr_val = 0;
+
+                Tuple<Integer> prevfield = visited.get(visited.size()-1);
+                visited.remove(visited.size()-1);
+                row = prevfield.a;
+                col = prevfield.b;
+                fixDomainsAfterReturn(board,row,col);
+
+
+            }//else
+
+
+        }//while
+
+        System.out.println("FC: liczba nawrotow: " + return_count + " liczba wywolan petli: " + loops_count);
+        return board;
+
+    }
+
+
+    public SquareVariable[][] forwardCheckAll(SquareVariable[][] board){ // najmniej w dziedzinie
+
+        ArrayList<Tuple<Integer>> visited  = new ArrayList<>();
+
+        int set = 1;
+        int toset = N*N;
+
+        int return_count=0;
+        int loops_count = 0;
+
+        Tuple<Integer> coords =getNextFieldH1(board, visited);
+
+        int row = coords.a;
+        int col = coords.b;
+
+        boolean count = true;
+        int all =0;
+
+        while(count) {
+            while (set <= toset){
+                loops_count+=1;
+                //   System.out.println("........................................");
+                //    System.out.println("set: " +set);
+                //    System.out.println("rc: " + row + " " + col);
+
+                if(row == -1 || col == -1){ // &&
+                    System.out.println("Nie ma rozwiazania");
+                    return null;
+                }
+
+                Integer a = board[row][col].domains.size();
+                //   System.out.println( "cv:" + board[row][col].curr_val + " ds: " + a  + "wd: "  +board[row][col].domains.get(a-1).size() );
+
+
+                int applied = applyFC(board, row, col); /// moze row i col w sv?
+
+                //System.out.println("aplied:" + applied);
+
+                if(applied != -1){
+                    System.out.println("ok");
+                    set +=1;
+                    updateValuesInDomains(board,applied,row,col);
+
+                    visited.add(new Tuple<>(row,col));
+
+                    //   for(Tuple<Integer> t :visited){
+                    //      System.out.print(t.a + " " + t.b + " | ");
+                    //   }
+                    System.out.println();
+
+                    Tuple<Integer> nextfield = getNextFieldH1(board, visited);
+                    row = nextfield.a;
+                    col = nextfield.b;
+
+
+
+                    printMatrix(board);
+                }//if
+
+                else{
+                    System.out.println("nawrot");
+                    return_count +=1;
+                    set -=1 ;
+                    board[row][col].curr_val = 0;
+
+                    Tuple<Integer> prevfield = visited.get(visited.size()-1);
+                    visited.remove(visited.size()-1);
+                    row = prevfield.a;
+                    col = prevfield.b;
+                    fixDomainsAfterReturn(board,row,col);
+
+
+                }//else
+
+
+            }//while
+
+            System.out.println("FC: liczba nawrotow: " + return_count + " liczba wywolan petli: " + loops_count);
+            all+=1;
+            System.out.println("all:" + all);
+            set -= 1;
+            Tuple<Integer> tmp = visited.get(visited.size()-1);
+         //   board[tmp.a][tmp.b].curr_val = 0;
+
+            Tuple<Integer> prevfield = visited.get(visited.size() - 1);
+            visited.remove(visited.size() - 1);
+            row = prevfield.a;
+            col = prevfield.b;
+            fixDomainsAfterReturn(board, row, col);
+        }return board;
+
+    }
+
+    //najbardziej ograniczona zmienna
     private Tuple<Integer> getNextFieldH1(SquareVariable[][] board, ArrayList<Tuple<Integer>> visited) {
         Tuple<Integer> next = new Tuple<>(0,0);
         int minsize = board[0][0].getLastDomain().size();
-        System.out.println("vis:" + visited);
-        System.out.println("t: " + next.a + " " + next.b+ " ms: " + minsize);
+     //   System.out.println("vis:" + visited);
+        //System.out.println("t: " + next.a + " " + next.b+ " ms: " + minsize);
 
 
         for(int i =0 ; i<N;i++) {
             for (int j = 0; j < N; j++) {
-                System.out.println(i + " " + j + " s " + board[i][j].getLastDomain().size());
+                //System.out.println(i + " " + j + " s " + board[i][j].getLastDomain().size());
                 if (board[i][j].getLastDomain().size() <= minsize && !containsTuple(i, j, visited)) {
                     minsize = board[i][j].getLastDomain().size();
                     next = new Tuple<>(i, j);
@@ -430,7 +767,7 @@ public class LatinSquare {
             if(containsTuple(next.a, next.b,visited)){
                 next = new Tuple<>(-1,-1);
             }
-            System.out.println("t: " + next.a + " " + next.b+ " ms: " + minsize);
+          //  System.out.println("t: " + next.a + " " + next.b+ " ms: " + minsize);
             return next;
         }
 
@@ -455,7 +792,7 @@ public class LatinSquare {
             for (int n = 0; n < N; n++) {
                 if ((m == row || n == col) && !(m== row && n==col)) {
                     board[m][n].domains.remove(board[m][n].domains.size() - 1);
-                    System.out.println("usunieto dziedzine " + m + " " + n  + " liczba: " + board[m][n].domains.size() + " dziedzina ost: " + board[m][n].getLastDomain().toString());
+                  //  System.out.println("usunieto dziedzine " + m + " " + n  + " liczba: " + board[m][n].domains.size() + " dziedzina ost: " + board[m][n].getLastDomain().toString());
                 }
             }
         }
@@ -469,74 +806,31 @@ public class LatinSquare {
 
         for (int m = 0; m < N; m++) {
             for (int n = 0; n < N; n++) {
-                if (m == row || n == col) {
+                if (m == row || n == col ) {
                     ArrayList<Integer> newdomain = new ArrayList<>(board[m][n].getLastDomain());
                     newdomain.remove((Integer) value);
                     board[m][n].addNewDomain(newdomain);
-                    System.out.println("w dziedzinie " + m + " " + n + " usunieto " + value + " liczba: " + board[m][n].domains.size() + " dziedzina: " + board[m][n].getLastDomain().toString());
+                 //   System.out.println("w dziedzinie " + m + " " + n + " usunieto " + value + " liczba: " + board[m][n].domains.size() + " dziedzina: " + board[m][n].getLastDomain().toString());
                 }
             }
         }
     }
 
-//        public void updateValuesInDomainsH2(SquareVariable[][]board, int value, int row , int col) {
-//
-//            for (int m = 0; m < N; m++) {
-//                for (int n = 0; n < N; n++) {
-//                    if (m == row || n == col) {
-//                        ArrayList<Integer> newdomain = new ArrayList<>(board[m][n].getLastDomain());
-//                        newdomain.remove((Integer) value);
-//                        Collections.reverse(newdomain);
-//                        board[m][n].addNewDomain(newdomain);
-//                        System.out.println("w dziedzinie " + m + " " + n + " usunieto " + value + " liczba: " + board[m][n].domains.size() + " dziedzina: " + board[m][n].getLastDomain().toString());
-//                    }
-//                }
-//            }
-//        }
-
-
-
-
-//        for(int 11k =0; k<N; k++){
-//           ArrayList<Integer> newdomain = board[i][k].getLastDomain();
-//           newdomain.remove((Integer)value);
-//           board[i][k].addNewDomain(newdomain);
-//          //  board[i][k].getLastDomain().remove((Integer)value);
-//        }
-//
-//        //in j column
-//        for(int k =0; k<N; k++){
-//          //  ArrayList<ArrayList<Integer>> domains = board[k][j].domains;
-//            board[k][j].getLastDomain().remove((Integer)value);
-//        }
-
-
-
-//
-//    public void restoreAfterReturn(SquareVariable[][]board, int row , int col) {
-//
-//        for (int m = 0; m < N; m++) {
-//            for (int n = 0; n < N; n++) {
-//                if (m == row || n == col) {
-//                    board[m][n].domains.remove(board[m][n].domains.size() - 1);
-//                }
-//            }
-//        }
-//    }
 
 
     public int applyFC(SquareVariable[][] board, int i, int j){ // nie wystarczy podac tylko sv?
         int applied = -1;  // bool?
         SquareVariable sv= board[i][j];
         if(!sv.getLastDomain().isEmpty()){
-            System.out.println("last domain get 0 " + sv.getLastDomain().get(0));
+         //   System.out.println("last domain get 0 " + sv.getLastDomain().get(0));
             applied = sv.getLastDomain().get(0);
             sv.curr_val = applied;
         }
         return applied;
     }
 
-    public int applyFCH1(SquareVariable[][] board, int i, int j){ // h1 losowo
+// h1 wartosc losowo
+    public int applyFCH1(SquareVariable[][] board, int i, int j){
         int applied = -1;  // bool?
         SquareVariable sv= board[i][j];
         if(!sv.getLastDomain().isEmpty()){
@@ -546,8 +840,6 @@ public class LatinSquare {
         }
         return applied;
     }
-
-
 
 
     public SquareVariable[][] getEmptyBoard() {
@@ -572,12 +864,14 @@ public class LatinSquare {
 
 
     public static void main(String[] args) {
-        LatinSquare ls = new LatinSquare(4);
+        LatinSquare ls = new LatinSquare(5);
 
- //       ls.backtrack(ls.getEmptyBoard());
+        // ls.backtrack(ls.getEmptyBoard());
 
-      //ls.fwdcheck(ls.getEmptyBoard());
-      ls.backtrackAll(ls.getEmptyBoard());
+        //ls.backtrackAll(ls.getEmptyBoard());
+
+    ls.forwardCheck(ls.getEmptyBoard());
+    //  ls.fwdcheckAll(ls.getEmptyBoard());
 
     }
 }

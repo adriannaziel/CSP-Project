@@ -16,7 +16,7 @@ public class SquareVariable {
         curr_val = 0;
         domains = new ArrayList<>();
         domains.add(new ArrayList<>());
-        int[] range = IntStream.iterate(1, n -> {
+        IntStream.iterate(1, n -> {
             domains.get(0).add(n);return n + 1;}).limit(N).toArray();
 
         tried = new ArrayList<>();
@@ -24,9 +24,6 @@ public class SquareVariable {
 
     public void addNewDomain(ArrayList<Integer> newd){
         domains.add(newd);
-//        domains.add(new ArrayList<Integer>());
-//        int[] range = IntStream.iterate(1, n -> {
-//            domains.get(domains.size()-1).add(n);return n + 1;}).limit(N).toArray();
     }
 
     public ArrayList<Integer> getLastDomain() {
